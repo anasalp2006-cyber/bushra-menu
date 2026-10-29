@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>منيو بشرى الخير</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--ink:#1a1a1a;--muted:#6a6a6a;--line:#c4c4c4;--band:#3a2a25;--on-band:#f2b84b;--gold:#f2b84b;--price:#9a5a12;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1412;--ink:#f3ece8;--muted:#b0a39c;--line:#4a3a33;--band:#33241f;--price:#f2b84b}}
+:root[data-theme="dark"]{--bg:#1a1412;--ink:#f3ece8;--muted:#b0a39c;--line:#4a3a33;--band:#33241f;--price:#f2b84b}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0 auto;max-width:560px;background:var(--bg);color:var(--ink);font-family:"Tajawal",system-ui,sans-serif;font-size:16px;padding-bottom:40px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--band);z-index:10}
+header{text-align:center;padding:40px 20px 28px;background-color:var(--band);background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 6px);border-bottom:4px solid var(--gold)}
+header h1{font-family:"Reem Kufi","Tajawal",serif;font-weight:700;font-size:clamp(50px,17vw,76px);line-height:1.1;margin:0;color:var(--gold);text-shadow:0 2px 0 rgba(0,0,0,.35)}
+header .sub{font-family:"Reem Kufi","Tajawal",serif;font-size:19px;margin:8px 0 0;color:#f6efe6}
+header .en{margin:8px 0 0;font-size:15px;color:var(--gold);letter-spacing:.05em}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:18px 16px 4px}
+.chips button{font:inherit;font-weight:500;color:var(--price);background:transparent;border:1.5px solid var(--price);border-radius:999px;padding:6px 16px;cursor:pointer}
+section{scroll-margin-top:12px}
+h2{font-family:"Reem Kufi","Tajawal",serif;font-weight:600;font-size:25px;margin:30px 0 6px;padding:9px 20px;background:var(--band);color:var(--on-band)}
+.it{padding:12px 20px}
+.row{display:flex;align-items:baseline;gap:8px}
+.row b{font-weight:700;font-size:17.5px}
+.row i{flex:1;min-width:12px;border-bottom:2px dotted var(--line)}
+.row span{font-weight:700;color:var(--price);white-space:nowrap}
+.it p{margin:3px 0 0;font-size:14px;line-height:1.6;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:14px;line-height:1.9;margin:34px 20px 0}
+footer button{margin-top:14px;font:inherit;font-weight:700;color:var(--price);background:transparent;border:1.5px solid var(--price);border-radius:12px;padding:10px 20px;cursor:pointer}
+button:focus-visible{outline:3px solid var(--price);outline-offset:2px}
+.qr{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);padding:20px}
+.qr.open{display:flex}
+.card{background:#fff;color:#1a1a1a;border-radius:18px;padding:22px;text-align:center;width:100%;max-width:320px}
+.card h3{margin:0 0 12px;font-size:18px}
+#qrbox{display:inline-block;background:#fff;padding:12px;border:1px solid #ddd;min-height:60px}
+#qrbox img{display:block}
+.card .url{direction:ltr;word-break:break-all;font-size:12px;color:#666;margin:10px 0 4px}
+.card .tip{font-size:13px;color:#666;margin:0 0 14px}
+.card button{font:inherit;font-weight:700;background:#3a2a25;color:#f2b84b;border:0;border-radius:12px;padding:10px 28px;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="nm"></h1>
+  <p class="sub">قائمة الطعام</p>
+  <p class="en">Restaurant and café</p>
+</header>
+<nav class="chips" id="chips" aria-label="أقسام المنيو"></nav>
+<main id="menu"></main>
+<footer>
+  <div id="info"></div>
+  <button type="button" id="qrb">رمز QR للمنيو</button>
+</footer>
+
+<div class="qr" id="qr" role="dialog" aria-modal="true" aria-label="رمز QR">
+  <div class="card">
+    <h3>امسح الرمز لفتح المنيو</h3>
+    <div id="qrbox"></div>
+    <div class="url" id="url"></div>
+    <p class="tip">صوّر الشاشة لتطبعه أو تشاركه.</p>
+    <button type="button" id="qx">إغلاق</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* عدّل هنا: الاسم، العملة، الدوام، العنوان. السعر المعروض = سعر الصنف × rate مقرّباً لأقرب step. اجعل rate:1 و step:1 إذا كتبت الأسعار بالليرة مباشرة */
+const CONFIG={name:"بشرى الخير",cur:"ل.س",rate:125,step:50,hours:"يومياً من ١٢ ظهراً حتى ١٢ ليلاً",addr:"جديدة الوادي، إطلالة المرج"};
+/* المنيو: n الاسم، d الوصف، p السعر */
+const MENU=[
+{t:"المشاوي",items:[
+{n:"شيش طاووق",d:"صدور دجاج متبّلة بالثوم والليمون، مع أرز وثومية",p:7},
+{n:"كباب حلبي",d:"لحمة غنم مفرومة بالفليفلة الحمراء، مع بصل وبقدونس",p:9},
+{n:"مشاوي مشكّلة",d:"شيش طاووق وكباب وريش، تكفي شخصين",p:16},
+{n:"فروج مشوي",d:"نصف فروج على الفحم مع بطاطا وثومية",p:8}]},
+{t:"السندويشات",items:[
+{n:"شاورما دجاج",d:"مع ثومية ومخلل وبطاطا",p:3},
+{n:"شاورما لحمة",d:"مع طحينة وبصل وبقدونس وسماق",p:4},
+{n:"فلافل",d:"قرصات مقرمشة مع طحينة وخضار",p:2},
+{n:"برغر لحمة",d:"لحمة بلدي مع جبنة وخضار وبطاطا",p:5}]},
+{t:"المقبلات",items:[
+{n:"حمص بالطحينة",d:"مع زيت زيتون وحبّات حمص",p:3},
+{n:"متبّل باذنجان",d:"باذنجان مشوي مع طحينة ودبس رمان",p:3},
+{n:"فتّوش",d:"خضار طازجة مع خبز مقرمش وسماق",p:3.5},
+{n:"كبّة مقلية",d:"أربع قطع محشية باللحمة والجوز",p:4.5}]},
+{t:"المشروبات الباردة",items:[
+{n:"عصير ليمون بالنعنع",d:"",p:2},
+{n:"عصير برتقال طازج",d:"",p:2.5},
+{n:"عصير مانغا",d:"",p:3},
+{n:"موهيتو",d:"ليمون ونعنع وصودا",p:3},
+{n:"عيران",d:"",p:1.5},
+{n:"مشروب غازي",d:"",p:1},
+{n:"مياه معدنية",d:"",p:0.5}]},
+{t:"المشروبات الساخنة",items:[
+{n:"شاي",d:"",p:1},
+{n:"شاي بالنعنع",d:"",p:1.2},
+{n:"قهوة عربية",d:"مع هيل",p:1.5},
+{n:"قهوة تركية",d:"",p:1.5},
+{n:"نسكافيه",d:"",p:2},
+{n:"زهورات",d:"بابونج أو ينسون أو زنجبيل",p:1.5}]},
+{t:"الحلويات",items:[
+{n:"كنافة نابلسية",d:"جبنة بلدية وقطر، تُقدَّم ساخنة",p:4},
+{n:"بقلاوة",d:"ثلاث قطع بالفستق الحلبي",p:4},
+{n:"مهلبية",d:"بماء الورد والفستق",p:2}]},
+{t:"الأراكيل",items:[
+{n:"أركيلة تفاحتين",d:"",p:5},
+{n:"أركيلة نعنع",d:"",p:5},
+{n:"أركيلة علكة",d:"",p:5},
+{n:"أركيلة مشكّلة",d:"اختيار من النكهات المتوفرة",p:6},
+{n:"تبديل رأس",d:"",p:2}]}
+];
+const $=s=>document.querySelector(s);
+const money=n=>(Math.round(n*CONFIG.rate/CONFIG.step)*CONFIG.step).toLocaleString("en-US")+" "+CONFIG.cur;
+document.title="منيو "+CONFIG.name;
+$("#nm").textContent=CONFIG.name;
+$("#info").innerHTML="🕛 "+CONFIG.hours+"<br>📍 "+CONFIG.addr;
+$("#chips").innerHTML=MENU.map((c,i)=>"<button type=\"button\" data-i=\""+i+"\">"+c.t+"</button>").join("");
+$("#menu").innerHTML=MENU.map((c,i)=>"<section id=\"s"+i+"\"><h2>"+c.t+"</h2>"+c.items.map(it=>"<div class=\"it\"><div class=\"row\"><b>"+it.n+"</b><i></i><span>"+money(it.p)+"</span></div>"+(it.d?"<p>"+it.d+"</p>":"")+"</div>").join("")+"</section>").join("");
+$("#chips").addEventListener("click",e=>{const b=e.target.closest("button");if(b)$("#s"+b.dataset.i).scrollIntoView()});
+let made=false;
+$("#qrb").onclick=()=>{
+  $("#qr").classList.add("open");
+  const url=location.href.split("#")[0];
+  $("#url").textContent=url;
+  if(!made){made=true;try{new QRCode($("#qrbox"),{text:url,width:220,height:220,correctLevel:QRCode.CorrectLevel.M})}catch(e){$("#qrbox").textContent="تعذّر إنشاء الرمز"}}
+};
+$("#qx").onclick=()=>$("#qr").classList.remove("open");
+$("#qr").addEventListener("click",e=>{if(e.target.id==="qr")$("#qr").classList.remove("open")});
+</script>
+</body>
+</html>
